@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}New Invoice{% endblock %}
+{% block content %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">Framalaundromat Invoice Management System</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-link" href="/logout/">Log Out</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+    <form class="form" action="/items/" method="POST">
+        <h4>Add Items</h4>
+        {% csrf_token %}
+        <input type="hidden" name="invoice" value="{{ invoice }}"/>
+        {{ form.as_p }}
+        <input class='btn btn-info' type="submit" value="Add Item"/>
+    </form>
+    <table class="table">
+        <tr>
+            <th>Description</th>
+            <th>Unit Price</th>
+            <th>Units</th>
+            <th>Total Cost</th>
+            <th>Action</th>
+        </tr>
+        {%if items != None %}
+        {% for item in items %}
+        <tr>
+            <td>{{ item.description }}</td>
+            <td>{{ item.price_per_lbs }}</td>
+            <td>{{ item.weight }}</td>
+            <td>{{ item.amount }}</td>
+            <td><a class="btn btn-danger" href="/delete/item/{{ item.id }}">Delete</a></td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <span>No item yet!</span>
+        </tr>
+        {% endif %}
+    </table>
+    <a class="btn btn-info" href="/tax/">Next</a>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}New Invoice{% endblock %}
+{% block content %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">Framalaundromat Invoice Management System</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-link" href="/logout/">Log Out</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+    <h3>Customer Details</h3>
+    <form class="form" method="POST" action='/edit/customer/'>
+        <input type="hidden" name="id" value='{{ id }}'>
+        {% csrf_token %}
+        {{ form1.as_p }}
+        <input type="submit" value="Submit" class="btn btn-info">
+    </form>
+    <h3>Tax and Discount Details</h3>
+    <form class="form" method="POST" action='/edit/tax/'>
+        <input type="hidden" name="id" value='{{ id }}'>
+        {% csrf_token %}
+        {{ form2.as_p }}
+        <input type="submit" value="Submit" class="btn btn-info">
+    </form>
+    <h3>Item List</h3>
+    <form class="form" action="/add/item/" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="invoice" value="{{ id }}"/>
+        {{ forms.as_p }}
+        <input class='btn btn-info' type="submit" value="Add Item"/>
+    </form>
+    <table class="table">
+        <tr>
+            <th>Description</th>
+            <th>Price Per Unit</th>
+            <th>Unit</th>
+            <th>Amount</th>
+            <th>Action</th>
+        </tr>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.description }}</td>
+            <td>{{ item.price_per_lbs }}</td>
+            <td>{{ item.weight }}</td>
+            <td>{{ item.amount }}</td>
+            <td>
+                <a href="/edit/item/{{ id }}/{{ item.id }}" class="btn btn-warning">Edit</a>
+                <a href="/delete/item/{{ item.id }}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+</div>
+{% endblock %}
