@@ -1,6 +1,14 @@
 from django.db import models
 
 # Create your models here.
+class Profile(models.Model):
+    name = models.CharField(max_length=100)
+    street_address = models.CharField(max_length=100)
+    city_address = models.CharField(max_length=100)
+
+    def __str__(self):
+        return "My Profile"
+
 class Invoice(models.Model):
     name = models.CharField(max_length=100)
     company = models.CharField(max_length=100)
@@ -9,6 +17,7 @@ class Invoice(models.Model):
     tax_rate = models.FloatField(blank=True,null=True)
     discount_rate = models.FloatField(blank=True,null=True)
     total = models.FloatField(blank=True,null=True)
+    comments = models.TextField()
     created_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):

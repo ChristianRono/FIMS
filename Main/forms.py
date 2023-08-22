@@ -1,5 +1,10 @@
 from django import forms
-from Main.models import Invoice,Item
+from Main.models import Invoice,Item,Profile
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['name','street_address','city_address']
 
 class CustomerForm(forms.ModelForm):
     class Meta:
@@ -14,6 +19,7 @@ class ItemsForm(forms.ModelForm):
 class TaxForm(forms.Form):
     tax = forms.FloatField(max_value=100,min_value=0,initial=0)
     discount = forms.FloatField(max_value=100,min_value=0,initial=0)
+    comments = forms.CharField(widget=forms.Textarea)
 
 class EmailForm(forms.Form):
     to = forms.EmailField(label="To:")

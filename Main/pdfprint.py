@@ -5,12 +5,17 @@ import os
 
 from Main.pdf_water_mark import watermark_file
 
-def pdf_print(invoice,items):
+def pdf_print(invoice,profile,items):
         invoice_number = invoice.id
         name = invoice.name
         street_address = invoice.street_address
         company = invoice.company
         city_address = invoice.city_address
+        comments = invoice.comments
+        myname = profile.name
+        mycompany = "Framalaundromat"
+        mystreet_address = profile.street_address
+        mycity_address = profile.city_address
         invoice_date = formats.date_format(invoice.created_on, "SHORT_DATETIME_FORMAT")
         total = round(invoice.total,2)
         tax = invoice.tax_rate
@@ -19,8 +24,11 @@ def pdf_print(invoice,items):
         desktop = os.path.join(Path.home(),'Desktop')
         desktop = os.path.join(desktop,'Invoices')
         pdf_file_name = os.path.join(desktop,f"{str(invoice_number)}_{str(name)}.pdf")
-        generate_invoice(str(name), str(invoice_number),items,str(total),str(company), str(street_address), str(city_address),str(invoice_date), str(tax),
-            str(discount), str(invoice_type), pdf_file_name)
+        generate_invoice(str(name), str(invoice_number),items,
+                         str(myname),str(mycompany),str(mystreet_address),str(mycity_address),
+                         str(total),str(company), 
+                         str(street_address), str(city_address),str(invoice_date), str(tax),
+                         str(discount), str(comments),str(invoice_type), pdf_file_name)
         #watermark_file('watermark.pdf',pdf_file_name)
         #os.remove('watermark.pdf')
 
@@ -31,7 +39,9 @@ def generate_water_mark(c):
         c.drawImage("image/watermark.png", x+100*i, y+120*i, 160, 160,mask='auto')
 
 def generate_invoice(name, invoice_number, items,
-        total, company, street_address, city_address,invoice_date, tax, discount, invoice_type, pdf_file_name):
+                     myname,mycompany,mystreet_address,mycity_address,
+                     total, company, street_address, city_address,invoice_date, 
+                     tax, discount, comments,invoice_type, pdf_file_name):
     c = canvas.Canvas(pdf_file_name)
 
     # image of seal
@@ -64,44 +74,65 @@ def generate_invoice(name, invoice_number, items,
     c.setFont('Helvetica-Bold', 12, leading=None)
     c.drawCentredString(484, 622, '$'+total)
 
+    # My Details
+    c.setFont('Helvetica', 12, leading=None)
+    c.drawString(60, 660, "From:")
+    c.setFont('Helvetica', 12, leading=None)
+    c.drawString(100, 660, myname)
 
     c.setFont('Helvetica', 12, leading=None)
-    c.drawCentredString(60, 660, "To:")
+    c.drawString(60, 640, "Company:")
     c.setFont('Helvetica', 12, leading=None)
-    c.drawCentredString(200, 660, name)
+    c.drawString(120, 640, mycompany)
 
     c.setFont('Helvetica', 12, leading=None)
-    c.drawCentredString(60, 640, "Company:")
+    c.drawString(60, 620, "Street:")
     c.setFont('Helvetica', 12, leading=None)
-    c.drawCentredString(200, 640, company)
+    c.drawString(100, 620, mystreet_address) 
 
     c.setFont('Helvetica', 12, leading=None)
-    c.drawCentredString(60, 620, "Street:")
+    c.drawString(60, 600, "City:")
     c.setFont('Helvetica', 12, leading=None)
-    c.drawCentredString(200, 620, street_address) 
+    c.drawString(100, 600, mycity_address)  
+
+    # Customers Details
+    c.setFont('Helvetica', 12, leading=None)
+    c.drawString(60, 540, "To:")
+    c.setFont('Helvetica', 12, leading=None)
+    c.drawString(80, 540, name)
 
     c.setFont('Helvetica', 12, leading=None)
-    c.drawCentredString(60, 600, "City:")
+    c.drawString(60, 520, "Company:")
     c.setFont('Helvetica', 12, leading=None)
-    c.drawCentredString(200, 600, city_address)     
+    c.drawString(120, 520, company)
+
+    c.setFont('Helvetica', 12, leading=None)
+    c.drawString(60, 500, "Street:")
+    c.setFont('Helvetica', 12, leading=None)
+    c.drawString(100, 500, street_address) 
+
+    c.setFont('Helvetica', 12, leading=None)
+    c.drawString(60, 480, "City:")
+    c.setFont('Helvetica', 12, leading=None)
+    c.drawString(100, 480, city_address)     
 
     c.setFont('Helvetica-Bold', 14, leading=None)
-    c.drawCentredString(310, 580, str(invoice_type))
-    c.drawCentredString(110, 560, "Particulars:")
-    if len(items) <= 7: 
-        j = 510
+    c.drawCentredString(310, 460, str(invoice_type))
+    c.drawCentredString(110, 440, "Particulars:")
+    if len(items) <= 4: 
+        j = 420
         for i in range(len(items)):
             c.drawCentredString(295, j, "__________________________________________________________")
             j -= 30
         c.drawCentredString(295, j, "__________________________________________________________")
 
         c.setFont('Helvetica-Bold', 12, leading=None)
-        c.drawCentredString(110, 520, 'ITEMS')     
-        c.drawCentredString(220, 520, 'UNITS')     
-        c.drawCentredString(330, 520, 'UNIT PRICE')     
-        c.drawCentredString(450, 520, 'LINE TOTAL')  
+        c.drawCentredString(110, 420, 'ITEMS')     
+        c.drawCentredString(220, 420, 'UNITS')     
+        c.drawCentredString(330, 420, 'UNIT PRICE')     
+        c.drawCentredString(450, 420, 'LINE TOTAL')  
 
-        i =490
+        i =400
         for item in items:
             c.setFont('Helvetica', 12, leading=None)
             c.drawCentredString(110, i, item.description)     
@@ -113,10 +144,16 @@ def generate_invoice(name, invoice_number, items,
         
         c.setFont('Helvetica-Bold', 12,leading=None)
         c.drawCentredString(150, 260, 'Comments')
-        j = 240
-        for i in range(3):
-            c.drawCentredString(295, j, "__________________________________________________________")
-            j -= 30
+        c.setFont('Helvetica', 12,leading=None)
+        if len(comments) > 100:
+            c.drawString(50,240,comments[:100])
+            if len(comments) > 200:
+                c.drawString(50,220,comments[100:200])
+                c.drawString(50,200,comments[200:280])
+            else:
+                c.drawString(50,220,comments[100:])
+        else:
+            c.drawCentredString(150, 240, comments)
         
         c.setFont('Helvetica-Bold', 12, leading=None)
         c.drawCentredString(400, 140, "Tax:")
@@ -142,19 +179,19 @@ def generate_invoice(name, invoice_number, items,
         c.drawCentredString(170, 80, 'Manager')
     else:
         if len(items) > 12:
-            j = 510
+            j = 420
             for i in range(12):
                 c.drawCentredString(295, j, "__________________________________________________________")
                 j -= 30
             c.drawCentredString(295, j, "__________________________________________________________")
 
             c.setFont('Helvetica-Bold', 12, leading=None)
-            c.drawCentredString(110, 520, 'ITEMS')     
-            c.drawCentredString(220, 520, 'UNITS')     
-            c.drawCentredString(330, 520, 'UNIT PRICE')     
-            c.drawCentredString(450, 520, 'LINE TOTAL')  
+            c.drawCentredString(110, 420, 'ITEMS')     
+            c.drawCentredString(220, 420, 'UNITS')     
+            c.drawCentredString(330, 420, 'UNIT PRICE')     
+            c.drawCentredString(450, 420, 'LINE TOTAL')  
 
-            i =490
+            i =400
             for item in items[:12]:
                 c.setFont('Helvetica', 12, leading=None)
                 c.drawCentredString(110, i, item.description)     
@@ -189,13 +226,18 @@ def generate_invoice(name, invoice_number, items,
                 c.drawCentredString(450, i, str(item.amount))
                 i -= 30
 
-            h = 720
             c.setFont('Helvetica-Bold', 12,leading=None)
             c.drawCentredString(150, 260, 'Comments')
-            j = 240
-            for i in range(3):
-                c.drawCentredString(295, j, "__________________________________________________________")
-                j -= 30
+            c.setFont('Helvetica', 12,leading=None)
+            if len(comments) > 100:
+                c.drawString(50,240,comments[:100])
+                if len(comments) > 200:
+                    c.drawString(50,220,comments[100:200])
+                    c.drawString(50,200,comments[200:280])
+                else:
+                    c.drawString(50,220,comments[100:])
+            else:
+                c.drawCentredString(150, 240, comments)
 
             c.setFont('Helvetica-Bold', 12, leading=None)
             c.drawCentredString(400, 140, "Tax:")
@@ -220,19 +262,19 @@ def generate_invoice(name, invoice_number, items,
             c.setFont('Helvetica-Bold', 12, leading=None)
             c.drawCentredString(170, 80, 'Manager')
         else:
-            j = 510
+            j = 420
             for i in range(len(items)):
                 c.drawCentredString(295, j, "__________________________________________________________")
                 j -= 30
             c.drawCentredString(295, j, "__________________________________________________________")
 
             c.setFont('Helvetica-Bold', 12, leading=None)
-            c.drawCentredString(110, 520, 'ITEMS')     
-            c.drawCentredString(220, 520, 'UNITS')     
-            c.drawCentredString(330, 520, 'UNIT PRICE')     
-            c.drawCentredString(450, 520, 'LINE TOTAL')  
+            c.drawCentredString(110, 420, 'ITEMS')     
+            c.drawCentredString(220, 420, 'UNITS')     
+            c.drawCentredString(330, 420, 'UNIT PRICE')     
+            c.drawCentredString(450, 420, 'LINE TOTAL')  
 
-            i =490
+            i =400
             for item in items:
                 c.setFont('Helvetica', 12, leading=None)
                 c.drawCentredString(110, i, item.description)     
@@ -249,9 +291,16 @@ def generate_invoice(name, invoice_number, items,
             c.setFont('Helvetica-Bold', 12,leading=None)
             c.drawCentredString(150, 720, 'Comments')
             j = 700
-            for i in range(3):
-                c.drawCentredString(295, j, "__________________________________________________________")
-                j -= 30
+            c.setFont('Helvetica', 12,leading=None)
+            if len(comments) > 100:
+                c.drawString(50,700,comments[:100])
+                if len(comments) > 200:
+                    c.drawString(50,680,comments[100:200])
+                    c.drawString(50,660,comments[200:280])
+                else:
+                    c.drawString(50,680,comments[100:])
+            else:
+                c.drawCentredString(150, 700, comments)
 
             c.setFont('Helvetica-Bold', 12, leading=None)
             c.drawCentredString(400, 580, "Tax:")

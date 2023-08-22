@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">Framalaundromat Invoice Management System</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-link" href="/logout/">Log Out</a>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="container">
+    <form class="form" action="{% url 'profile' %}" method="POST">
+        <h3>My Profile</h3>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn btn-info" value="Send">
+    </form>
+</div>
+{% endblock %}

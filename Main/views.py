@@ -4,8 +4,8 @@ from pathlib import Path
 from django.shortcuts import render,redirect
 from django.core.mail import EmailMessage
 
-from .models import Invoice,Item
-from .forms import CustomerForm,ItemsForm,TaxForm,EmailForm
+from .models import Invoice,Item,Profile
+from .forms import CustomerForm,ItemsForm,TaxForm,EmailForm,ProfileForm
 
 from Main.pdfprint import pdf_print
 # Create your views here.
@@ -13,6 +13,18 @@ from Main.pdfprint import pdf_print
 def homepage(request):
     invoices = Invoice.objects.all()
     return render(request,"homepage.html",{"invoices":invoices})
+
+def profile(request):
+    if request.method == "POST":
+        instance = Profile.objects.get(id=1)
+        form = ProfileForm(request.POST,instance=instance)
+        if form.is_valid():
+            form.save(commit=True)
+            return redirect('profile')
+    else:
+        instance = Profile.objects.get(id=1)
+        form = ProfileForm(instance=instance)
+        return render(request,"profile.html",{'form':form})
 
 def customer(request):
     if request.method == "POST":
@@ -59,10 +71,12 @@ def tax(request):
         if form.is_valid():
             tax_rate = form.cleaned_data['tax']
             discount_rate = form.cleaned_data['discount']
+            comments = form.cleaned_data['comments']
             invoice_id = request.session['id']
             invoice = Invoice.objects.get(id=invoice_id)
             invoice.tax_rate =tax_rate
             invoice.discount_rate = discount_rate
+            invoice.comments = comments
             items = Item.objects.filter(invoice=invoice)
             total = 0
             for item in items:
@@ -100,8 +114,9 @@ def delete_item(request,id):
 
 def pdfprint(request,id):
     invoice = Invoice.objects.get(id=id)
+    profiles = Profile.objects.get(id=id)
     items = Item.objects.filter(invoice=invoice)
-    pdf_print(invoice,items)
+    pdf_print(invoice,profiles,items)
     return redirect('/')
 
 def edit(request,id):
@@ -111,7 +126,7 @@ def edit(request,id):
         invoice = Invoice.objects.get(id=id)
         items = Item.objects.filter(invoice=invoice)
         form1 = CustomerForm(instance=invoice)
-        form2 = TaxForm(initial={'tax':invoice.tax_rate,'discount':invoice.discount_rate})
+        form2 = TaxForm(initial={'tax':invoice.tax_rate,'discount':invoice.discount_rate,'comments':invoice.comments})
         form3 = ItemsForm()
     return render(request,"edit.html",{"form1":form1,
                                        "form2":form2,
@@ -142,10 +157,12 @@ def edit_tax(request):
         if form.is_valid():
             tax = form.cleaned_data['tax']
             discount = form.cleaned_data['discount']
+            comments = form.cleaned_data['comments']
             id = request.POST['id']
             invoice = Invoice.objects.get(id=id)
             invoice.tax_rate = tax
             invoice.discount_rate = discount
+            invoice.comments = comments
             invoice.save()
             return redirect(f'/edit/invoice/{id}/')
 

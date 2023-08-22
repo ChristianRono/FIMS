@@ -19,7 +19,7 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
 
-from Main.views import homepage,customer,tax,items,delete_invoice,delete_item,pdfprint,edit,edit_item,edit_customer,edit_tax,add_item,send_mail
+from Main.views import homepage,customer,tax,items,delete_invoice,delete_item,pdfprint,edit,edit_item,edit_customer,edit_tax,add_item,send_mail,profile
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,5 +37,6 @@ urlpatterns = [
     path('edit/item/<int:invoiceid>/<int:itemid>/',view=edit_item,name="edit item"),
     path('add/item/',view=add_item,name="add item"),
     path('send/<int:id>/',view=send_mail,name="send mail"),
+    path('profile/', view=profile, name="profile"),
     path('',view=homepage,name='homepage'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
